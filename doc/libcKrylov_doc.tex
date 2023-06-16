@@ -1,0 +1,221 @@
+\documentclass[10pt]{article}
+
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{algorithmicx}
+\usepackage{verbatim}
+
+\usepackage{xcolor}
+\usepackage{natbib}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{graphicx}
+\usepackage{url}
+\usepackage[top=2.5cm,bottom=2.5cm,left=2.5cm,right=2.5cm]{geometry}
+
+\usepackage{times}
+\graphicspath{{Figures/}}
+
+
+\title{libcKrylov algorithm collection}
+\author{Pengliang Yang\\
+  Harbin Institute of Technology, China\\
+Email: ypl.2100@gmail.com} 
+
+\begin{document}
+
+\maketitle
+
+
+\begin{algorithm}[H]
+  \caption{Conjugate gradient algorithm for solving $Ax=b$ ($A^H=A$) \citep{Shewchuk_1994_ICG}}\label{alg:CG}
+  \begin{algorithmic}[1]
+  \State $x_0:=0$
+  \State $r_0:=b-A x_0=b$
+  \State $p_0:=r_0$
+    \For{$k=0,\cdots,N_{CG}-1$}
+    \State $\alpha_k=\frac{r_k^H r_k}{p_k^H Ap_k}$
+    \State $x_{k+1}=x_k + \alpha_k p_k$
+    \State $r_{k+1}=r_k - \alpha_k A p_k$
+    \State $\beta_{k} = \frac{r_{k+1}^H r_{k+1}}{r_k^H r_k}$\;
+    \State $p_{k+1}=r_{k+1} + \beta_k p_k$\;
+    \EndFor
+  \end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}[H]
+  \caption{Preconditioned Conjugate gradient algorithm for solving $Ax=b$ \citep[algorithm 9.1]{Saad_2003_IMS}}
+  \begin{algorithmic}[1]
+  \State $x_0:=0$
+  \State $r_0:=b-A x_0=b$
+  \State $z_0:=M^{-1}r_0$
+  \State $p_0:=z_0$
+    \For{$k=0,\cdots,N_{CG}-1$}
+    \State $\alpha_k=\frac{r_k^H p_k}{p_k^H Ap_k}$
+    \State $x_{k+1}=x_k + \alpha_k p_k$
+    \State $r_{k+1}=r_k - \alpha_k A p_k$
+    \State $z_{k+1}:=M^{-1}r_{k+1}$
+    \State $\beta_{k} = \frac{r_{k+1}^H z_{k+1}}{r_k^H z_k}$\;
+    \State $p_{k+1}=z_{k+1} + \beta_k p_k$\;
+    \EndFor
+  \end{algorithmic}
+\end{algorithm}
+
+
+\begin{algorithm}[H]
+  \caption{GMRES \citep[algorithm 6.9]{Saad_2003_IMS}}
+  \begin{algorithmic}[1]
+    \State $r_0:=b-A x_0=b$
+    \State $\beta=\|r_0\|_2$
+    \State $v_1:=r_0/\beta$
+    \For{$j=1,\cdots,m$}
+    \State compute $w_j=Av_j$
+        \For{$i=1,\cdots,j$}
+        \State $h_{ij}=(w_j,v_i)$
+        \State $w_j=W_j-h_{ij} v_i$
+        \EndFor
+    \State $h_{j+1,j}=\|w_j\|_2$. If $h_{j+1,j}=0$, set $m=j$ and go to
+    \State $v_{j+1} = w_j/h_{j+1,j}$
+    \State solve least-squares problem $\min_y\|\begin{bmatrix}
+    \beta\\
+    0\\
+    \cdots\\
+    0
+    \end{bmatrix}- \tilde{H}_m y\|_2$ by Givens rotation
+    \State $x_m = x_0+V_m y_m$
+    \EndFor
+  \end{algorithmic}
+\end{algorithm}
+
+
+\begin{algorithm}[H]
+  \caption{GMRES with right preconditioning \citep[algorithm 9.5]{Saad_2003_IMS}}\label{alg:CG}
+  \begin{algorithmic}[1]
+    \State $r_0:=b-A x_0=b$
+    \State $\beta=\|r_0\|_2$
+    \State $v_1:=r_0/\beta$
+    \For{$j=1,\cdots,m$}
+    \State compute $w_j=AM^{-1}v_j$
+        \For{$i=1,\cdots,j$}
+        \State $h_{ij}=(w_j,v_i)$
+        \State $w_j=W_j-h_{ij} v_i$
+        \EndFor
+    \State $h_{j+1,j}=\|w_j\|_2$. If $h_{j+1,j}=0$, set $m=j$ and go to
+    \State $v_{j+1} = w_j/h_{j+1,j}$
+    \State solve least-squares problem $\min_y\|\begin{bmatrix}
+    \beta\\
+    0\\
+    \cdots\\
+    0
+    \end{bmatrix}- \tilde{H}_m y\|_2$ by Givens rotation
+    \State $x_m = x_0+M^{-1}V_m y_m$
+    \EndFor
+  \end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}[H]
+  \caption{BiCGStab \citep{chen2016analysis}, improved version from \citep{van1992bicgstab}}\label{alg:CG}
+  \begin{algorithmic}[1]
+    \State $r_0=b-Ax_0,$ $\tilde{r}_0$ arbitrary but $(\tilde{r}_0,r_0)\neq 0$
+    \State $p_0 = r_0$
+    \For{$j=0,1,\cdots,  $ until convergence}
+    \State $\alpha_j = (r_j , \tilde{r}_0 )/(Ap_j , \tilde{r}_0 )$
+    \State $s_j=r_j-\alpha_j Ap_j$ 
+    \State $\omega_j = (As_j , s_j )/(As_j , As_j ) $
+    \State $x_{j+1} = x_j + \alpha_j  p_j + \omega_j s_j$
+    \State $r_{j+1}=s_j-\omega_j As_j$
+    \State $\beta_j = (r_{j+1},\tilde{r}_0 )/(r_j,\tilde{r}_0 )\cdot \alpha_j/\omega_j$
+    \State $p_{j+1}=r_{j+1}+\beta_j(p_j-\omega_j Ap_j)$
+    \EndFor
+  \end{algorithmic}
+\end{algorithm}
+
+
+\begin{algorithm}[H]
+  \caption{BiCGStab with right preconditioning (Flexible BiCGStab) \citep{chen2016analysis}}\label{alg:CG}
+  \begin{algorithmic}[1]
+    \State $r_0=b-Ax_0,$ $\tilde{r}_0$ arbitrary but $(\tilde{r}_0,r_0)\neq 0$
+    \State $p_0 = r_0$
+    \For{$j=0,1,\cdots $ until convergence}
+    \State $\tilde{p}_j=M^{-1}p_j$
+    \State $\alpha_j = (r_j , \tilde{r}_0 )/(A\tilde{p}_j, \tilde{r}_0 )$
+    \State $s_j=r_j-\alpha_j A\tilde{p}_j$
+    \State $\tilde{s}_j=M^{-1}s_j$
+    \State $\omega_j = (A\tilde{s}_j , s_j )/(A\tilde{s}_j,A\tilde{s}_j ) $
+    \State $x_{j+1} = x_j + \alpha_j  p_j + \omega_j s_j$
+    \State $r_{j+1}=s_j-\omega_j A\tilde{s}_j$
+    \State $\beta_j = (r_{j+1},\tilde{r}_0 )/(r_j,\tilde{r}_0 )\cdot \alpha_j/\omega_j$
+    \State $p_{j+1}=r_{j+1}+\beta_j(p_j-\omega_j A\tilde{p}_j)$
+    \EndFor
+  \end{algorithmic}
+\end{algorithm}
+
+
+\begin{algorithm}[H]
+  \caption{CGNR \citep[algorithm 8.4]{Saad_2003_IMS}}
+  \begin{algorithmic}[1]
+    \State $r_0=b-Ax_0$
+    \State $z_0 = A^H r_0$
+    \State $p_0=z_0$
+    \For{$j=0,1,\cdots $ until convergence}
+    \State $w_i=Ap_i$
+    \State $\alpha_j = (z_j,z_j)/(w_j,w_j)$
+    \State $x_{j+1} = x_j + \alpha_j  p_j$
+    \State $r_{j+1}=s_j-\alpha_j w_j$
+    \State $z_{j+1}=A^H r_{j+1}$
+    \State $\beta_j = (z_{j+1},z_{j+1})/(z_j,z_j)$
+    \State $p_{j+1}=z_{j+1}+\beta_jp_j$
+    \EndFor
+  \end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}[H]
+  \caption{CGNE (Craig's method) \citep[algorithm 8.5]{Saad_2003_IMS}}
+  \begin{algorithmic}[1]
+    \State $r_0=b-Ax_0$
+    \State $p_0 = A^H r_0$
+    \For{$j=0,1,\cdots $ until convergence}
+    \State $\alpha_j = (r_j , r_j)/(p_j, p_j )$
+    \State $x_{j+1} = x_j + \alpha_j  p_j$
+    \State $r_{j+1}=s_j-\alpha_j Ap_j$
+    \State $\beta_j = (r_{j+1},r_{j+1})/(r_j,r_j)$
+    \State $p_{j+1}=A^H r_{j+1}+\beta_jp_j$
+    \EndFor
+  \end{algorithmic}
+\end{algorithm}
+
+
+\newpage
+\bibliographystyle{apalike}
+%\bibliography{../../../biblioseiscope.bib,../../../bibliopyang.bib,../../../biblioothers.bib}
+\newcommand{\SortNoop}[1]{}
+\begin{thebibliography}{}
+
+\bibitem[Chen et~al., 2016]{chen2016analysis}
+Chen, J., McInnes, L.~C., and Zhang, H. (2016).
+\newblock Analysis and practical use of flexible bicgstab.
+\newblock {\em Journal of Scientific Computing}, 68(2):803--825.
+
+\bibitem[Saad, 2003]{Saad_2003_IMS}
+Saad, Y. (2003).
+\newblock {\em Iterative {M}ethods for {S}parse {L}inear {S}ystems}.
+\newblock SIAM, Philadelphia.
+
+\bibitem[Shewchuk, 1994]{Shewchuk_1994_ICG}
+Shewchuk, J.~R. (1994).
+\newblock An introduction to the conjugate gradient method without the
+  agonizing pain.
+\newblock Technical Report Computer Science Technical Report CMU-CS-94-125,
+  School of computer science, Carnegie Mellon University.
+
+\bibitem[Van~der Vorst, 1992]{van1992bicgstab}
+Van~der Vorst, H.~A. (1992).
+\newblock {Bi-CGSTAB: A fast and smoothly converging variant of Bi-CG for the
+  solution of nonsymmetric linear systems}.
+\newblock {\em SIAM Journal on scientific and Statistical Computing},
+  13(2):631--644.
+
+\end{thebibliography}
+
+\end{document}
