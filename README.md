@@ -24,7 +24,7 @@ Linear solvers in Krylov space
 
 How to install and run
 ====================================================
-1. first compile source code for Krylov solvers library
+1. First, compile source code for Krylov solvers library
 
 	cd src;
 	
@@ -35,20 +35,30 @@ How to install and run
    for a new one, 'make clean' and 'make'.
    
    
-2. Run the demo for frequency domain wave equation:
+2. Then, test with the application examples!
 
-	cd demo_wave;
-	
-	make;
-	
-	./main
+Run the Toeplitz matrix inversion using CGNR and CGNE:
 
-   Run the demo for Poisson equation:
+    cd demo_toeplitz;
+
+    make;
+    
+    ./main
+
+Run the demo for frequency domain wave equation using BiCGStab and GMRES:
+
+    cd demo_wave;
+    	
+    make;
+	
+    ./main
+
+Run the demo for Poisson equation:
    
-	cd demo_poisson;
+    cd demo_poisson;
 	
-	make;
+    make;
 	
-	./main
+    ./main
 	
-   Note that you are free to modify the parameters in main.c to test different algorithm options and the performance.
+Note that you are free to modify the parameters in main.c to test different algorithm options and the performance.
