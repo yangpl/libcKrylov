@@ -10,6 +10,8 @@ Linear solvers in Krylov space
 
 * Conjugate gradient (CG) 
 
+* Preconditioned conjugate gradient (PCG) 
+
 * BiCGStab (Bi-conjugate gradient with stabalization)
 
 * BiCGStab with right preconditioning
@@ -53,7 +55,7 @@ Run the demo for frequency domain wave equation using BiCGStab and GMRES:
 	
     ./main
 
-Run the demo for Poisson equation:
+Run the demo for Poisson equation using CG and PCG:
    
     cd demo_poisson;
 	
