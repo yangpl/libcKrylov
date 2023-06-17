@@ -162,7 +162,7 @@ Email: ypl.2100@gmail.com}
     \State $w_i=Ap_i$
     \State $\alpha_j = (z_j,z_j)/(w_j,w_j)$
     \State $x_{j+1} = x_j + \alpha_j  p_j$
-    \State $r_{j+1}=s_j-\alpha_j w_j$
+    \State $r_{j+1} = r_j-\alpha_j w_j$
     \State $z_{j+1}=A^H r_{j+1}$
     \State $\beta_j = (z_{j+1},z_{j+1})/(z_j,z_j)$
     \State $p_{j+1}=z_{j+1}+\beta_jp_j$
@@ -178,7 +178,7 @@ Email: ypl.2100@gmail.com}
     \For{$j=0,1,\cdots $ until convergence}
     \State $\alpha_j = (r_j , r_j)/(p_j, p_j )$
     \State $x_{j+1} = x_j + \alpha_j  p_j$
-    \State $r_{j+1}=s_j-\alpha_j Ap_j$
+    \State $r_{j+1} = r_j-\alpha_j Ap_j$
     \State $\beta_j = (r_{j+1},r_{j+1})/(r_j,r_j)$
     \State $p_{j+1}=A^H r_{j+1}+\beta_jp_j$
     \EndFor
