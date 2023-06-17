@@ -31,10 +31,9 @@ Email: ypl.2100@gmail.com}
 \begin{algorithm}[H]
   \caption{Conjugate gradient algorithm for solving $Ax=b$ ($A^H=A$) \citep{Shewchuk_1994_ICG}}\label{alg:CG}
   \begin{algorithmic}[1]
-  \State $x_0:=0$
-  \State $r_0:=b-A x_0=b$
+  \State $r_0:=b-A x_0$
   \State $p_0:=r_0$
-    \For{$k=0,\cdots,N_{CG}-1$}
+    \For{$k=0,1,\cdots$ until convergence}
     \State $\alpha_k=\frac{r_k^H r_k}{p_k^H Ap_k}$
     \State $x_{k+1}=x_k + \alpha_k p_k$
     \State $r_{k+1}=r_k - \alpha_k A p_k$
@@ -45,13 +44,45 @@ Email: ypl.2100@gmail.com}
 \end{algorithm}
 
 \begin{algorithm}[H]
+  \caption{CGNR for solving $A^H Ax=A^H b$ \citep[algorithm 8.4]{Saad_2003_IMS}}
+  \begin{algorithmic}[1]
+    \State $r_0=b-Ax_0$
+    \State $z_0 = A^H r_0$
+    \State $p_0=z_0$
+    \For{$k=0,1,\cdots $ until convergence}
+    \State $w_k=Ap_k$
+    \State $\alpha_k = (z_k,z_k)/(w_k,w_k)$
+    \State $x_{k+1} = x_k + \alpha_k  p_k$
+    \State $r_{k+1} = r_k-\alpha_k w_k$
+    \State $z_{k+1}=A^H r_{k+1}$
+    \State $\beta_k = (z_{k+1},z_{k+1})/(z_k,z_k)$
+    \State $p_{k+1}=z_{k+1}+\beta_k p_k$
+    \EndFor
+  \end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}[H]
+  \caption{CGNE (Craig's method) \citep[algorithm 8.5]{Saad_2003_IMS}}
+  \begin{algorithmic}[1]
+    \State $r_0=b-Ax_0$
+    \State $p_0 = A^H r_0$
+    \For{$k=0,1,\cdots $ until convergence}
+    \State $\alpha_k = (r_k , r_k)/(p_k, p_k )$
+    \State $x_{k+1} = x_k + \alpha_k  p_k$
+    \State $r_{k+1} = r_k-\alpha_k Ap_k$
+    \State $\beta_k = (r_{k+1},r_{k+1})/(r_k,r_k)$
+    \State $p_{k+1}=A^H r_{k+1}+\beta_k p_k$
+    \EndFor
+  \end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}[H]
   \caption{Preconditioned Conjugate gradient algorithm for solving $Ax=b$ \citep[algorithm 9.1]{Saad_2003_IMS}}
   \begin{algorithmic}[1]
-  \State $x_0:=0$
   \State $r_0:=b-A x_0=b$
   \State $z_0:=M^{-1}r_0$
   \State $p_0:=z_0$
-    \For{$k=0,\cdots,N_{CG}-1$}
+    \For{$k=0,1,\cdots$ until convergence}
     \State $\alpha_k=\frac{r_k^H p_k}{p_k^H Ap_k}$
     \State $x_{k+1}=x_k + \alpha_k p_k$
     \State $r_{k+1}=r_k - \alpha_k A p_k$
@@ -64,6 +95,42 @@ Email: ypl.2100@gmail.com}
 
 
 \begin{algorithm}[H]
+  \caption{BiCGStab \citep{chen2016analysis}, improved version from \citep{van1992bicgstab}}\label{alg:CG}
+  \begin{algorithmic}[1]
+    \State $r_0=b-Ax_0,$ $\tilde{r}_0$ arbitrary but $(\tilde{r}_0,r_0)\neq 0$
+    \State $p_0 = r_0$
+    \For{$k=0,1,\cdots $ until convergence}
+    \State $\alpha_k = (r_k , \tilde{r}_0 )/(Ap_k , \tilde{r}_0 )$
+    \State $s_k=r_k-\alpha_k Ap_k$ 
+    \State $\omega_k = (As_k , s_k )/(As_k , As_k ) $
+    \State $x_{k+1} = x_k + \alpha_k  p_k + \omega_k s_k$
+    \State $r_{k+1}=s_k-\omega_k As_k$
+    \State $\beta_k = (r_{k+1},\tilde{r}_0 )/(r_k,\tilde{r}_0 )\cdot \alpha_k/\omega_k$
+    \State $p_{k+1}=r_{k+1}+\beta_k(p_k-\omega_k Ap_k)$
+    \EndFor
+  \end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}[H]
+  \caption{BiCGStab with right preconditioning (Flexible BiCGStab) \citep{chen2016analysis}}\label{alg:CG}
+  \begin{algorithmic}[1]
+    \State $r_0=b-Ax_0,$ $\tilde{r}_0$ arbitrary but $(\tilde{r}_0,r_0)\neq 0$
+    \State $p_0 = r_0$
+    \For{$k=0,1,\cdots $ until convergence}
+    \State $\tilde{p}_k=M^{-1}p_k$
+    \State $\alpha_k = (r_k , \tilde{r}_0 )/(A\tilde{p}_k, \tilde{r}_0 )$
+    \State $s_k=r_k-\alpha_k A\tilde{p}_k$
+    \State $\tilde{s}_k=M^{-1}s_k$
+    \State $\omega_k = (A\tilde{s}_k , s_k )/(A\tilde{s}_k,A\tilde{s}_k ) $
+    \State $x_{k+1} = x_k + \alpha_k  p_k + \omega_k s_k$
+    \State $r_{k+1}=s_k-\omega_k A\tilde{s}_k$
+    \State $\beta_k = (r_{k+1},\tilde{r}_0 )/(r_k,\tilde{r}_0 )\cdot \alpha_k/\omega_k$
+    \State $p_{k+1}=r_{k+1}+\beta_k(p_k-\omega_k A\tilde{p}_k)$
+    \EndFor
+  \end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}[H]
   \caption{GMRES \citep[algorithm 6.9]{Saad_2003_IMS}}
   \begin{algorithmic}[1]
     \State $r_0:=b-A x_0=b$
@@ -73,7 +140,7 @@ Email: ypl.2100@gmail.com}
     \State compute $w_j=Av_j$
         \For{$i=1,\cdots,j$}
         \State $h_{ij}=(w_j,v_i)$
-        \State $w_j=W_j-h_{ij} v_i$
+        \State $w_j=w_j-h_{ij} v_i$
         \EndFor
     \State $h_{j+1,j}=\|w_j\|_2$. If $h_{j+1,j}=0$, set $m=j$ and go to
     \State $v_{j+1} = w_j/h_{j+1,j}$
@@ -90,7 +157,7 @@ Email: ypl.2100@gmail.com}
 
 
 \begin{algorithm}[H]
-  \caption{GMRES with right preconditioning \citep[algorithm 9.5]{Saad_2003_IMS}}\label{alg:CG}
+  \caption{GMRES with right preconditioning (Flexible GMRES)\citep[algorithm 9.5]{Saad_2003_IMS}}\label{alg:CG}
   \begin{algorithmic}[1]
     \State $r_0:=b-A x_0=b$
     \State $\beta=\|r_0\|_2$
@@ -99,7 +166,7 @@ Email: ypl.2100@gmail.com}
     \State compute $w_j=AM^{-1}v_j$
         \For{$i=1,\cdots,j$}
         \State $h_{ij}=(w_j,v_i)$
-        \State $w_j=W_j-h_{ij} v_i$
+        \State $w_j=w_j-h_{ij} v_i$
         \EndFor
     \State $h_{j+1,j}=\|w_j\|_2$. If $h_{j+1,j}=0$, set $m=j$ and go to
     \State $v_{j+1} = w_j/h_{j+1,j}$
@@ -114,79 +181,8 @@ Email: ypl.2100@gmail.com}
   \end{algorithmic}
 \end{algorithm}
 
-\begin{algorithm}[H]
-  \caption{BiCGStab \citep{chen2016analysis}, improved version from \citep{van1992bicgstab}}\label{alg:CG}
-  \begin{algorithmic}[1]
-    \State $r_0=b-Ax_0,$ $\tilde{r}_0$ arbitrary but $(\tilde{r}_0,r_0)\neq 0$
-    \State $p_0 = r_0$
-    \For{$j=0,1,\cdots,  $ until convergence}
-    \State $\alpha_j = (r_j , \tilde{r}_0 )/(Ap_j , \tilde{r}_0 )$
-    \State $s_j=r_j-\alpha_j Ap_j$ 
-    \State $\omega_j = (As_j , s_j )/(As_j , As_j ) $
-    \State $x_{j+1} = x_j + \alpha_j  p_j + \omega_j s_j$
-    \State $r_{j+1}=s_j-\omega_j As_j$
-    \State $\beta_j = (r_{j+1},\tilde{r}_0 )/(r_j,\tilde{r}_0 )\cdot \alpha_j/\omega_j$
-    \State $p_{j+1}=r_{j+1}+\beta_j(p_j-\omega_j Ap_j)$
-    \EndFor
-  \end{algorithmic}
-\end{algorithm}
 
 
-\begin{algorithm}[H]
-  \caption{BiCGStab with right preconditioning (Flexible BiCGStab) \citep{chen2016analysis}}\label{alg:CG}
-  \begin{algorithmic}[1]
-    \State $r_0=b-Ax_0,$ $\tilde{r}_0$ arbitrary but $(\tilde{r}_0,r_0)\neq 0$
-    \State $p_0 = r_0$
-    \For{$j=0,1,\cdots $ until convergence}
-    \State $\tilde{p}_j=M^{-1}p_j$
-    \State $\alpha_j = (r_j , \tilde{r}_0 )/(A\tilde{p}_j, \tilde{r}_0 )$
-    \State $s_j=r_j-\alpha_j A\tilde{p}_j$
-    \State $\tilde{s}_j=M^{-1}s_j$
-    \State $\omega_j = (A\tilde{s}_j , s_j )/(A\tilde{s}_j,A\tilde{s}_j ) $
-    \State $x_{j+1} = x_j + \alpha_j  p_j + \omega_j s_j$
-    \State $r_{j+1}=s_j-\omega_j A\tilde{s}_j$
-    \State $\beta_j = (r_{j+1},\tilde{r}_0 )/(r_j,\tilde{r}_0 )\cdot \alpha_j/\omega_j$
-    \State $p_{j+1}=r_{j+1}+\beta_j(p_j-\omega_j A\tilde{p}_j)$
-    \EndFor
-  \end{algorithmic}
-\end{algorithm}
-
-
-\begin{algorithm}[H]
-  \caption{CGNR \citep[algorithm 8.4]{Saad_2003_IMS}}
-  \begin{algorithmic}[1]
-    \State $r_0=b-Ax_0$
-    \State $z_0 = A^H r_0$
-    \State $p_0=z_0$
-    \For{$j=0,1,\cdots $ until convergence}
-    \State $w_i=Ap_i$
-    \State $\alpha_j = (z_j,z_j)/(w_j,w_j)$
-    \State $x_{j+1} = x_j + \alpha_j  p_j$
-    \State $r_{j+1} = r_j-\alpha_j w_j$
-    \State $z_{j+1}=A^H r_{j+1}$
-    \State $\beta_j = (z_{j+1},z_{j+1})/(z_j,z_j)$
-    \State $p_{j+1}=z_{j+1}+\beta_jp_j$
-    \EndFor
-  \end{algorithmic}
-\end{algorithm}
-
-\begin{algorithm}[H]
-  \caption{CGNE (Craig's method) \citep[algorithm 8.5]{Saad_2003_IMS}}
-  \begin{algorithmic}[1]
-    \State $r_0=b-Ax_0$
-    \State $p_0 = A^H r_0$
-    \For{$j=0,1,\cdots $ until convergence}
-    \State $\alpha_j = (r_j , r_j)/(p_j, p_j )$
-    \State $x_{j+1} = x_j + \alpha_j  p_j$
-    \State $r_{j+1} = r_j-\alpha_j Ap_j$
-    \State $\beta_j = (r_{j+1},r_{j+1})/(r_j,r_j)$
-    \State $p_{j+1}=A^H r_{j+1}+\beta_jp_j$
-    \EndFor
-  \end{algorithmic}
-\end{algorithm}
-
-
-\newpage
 \bibliographystyle{apalike}
 %\bibliography{../../../biblioseiscope.bib,../../../bibliopyang.bib,../../../biblioothers.bib}
 \newcommand{\SortNoop}[1]{}
