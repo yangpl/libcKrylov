@@ -1,16 +1,21 @@
-pdflatex libcKrylov_doc.tex
-bibtex libcKrylov_doc.aux
-pdflatex libcKrylov_doc.tex
-pdflatex libcKrylov_doc.tex
+pdflatex libcKrylov.tex
+bibtex libcKrylov.aux
+pdflatex libcKrylov.tex
+pdflatex libcKrylov.tex
+#dvipdfm libcKrylov.dvi
 
+rm -rf *.aux
+rm -rf *.dvi
+rm -rf *.log
+rm -rf *.toc
+rm -rf *.bbl
+rm -rf *.blg
+rm -rf *.out
+rm -rf *.spl
+rm -rf *.gz
+rm -rf *.fff
+rm -rf *.lof
+rm -rf *~
 
-rm -rf libcKrylov_doc.aux
-rm -rf libcKrylov_doc.dvi
-rm -rf libcKrylov_doc.log
-rm -rf libcKrylov_doc.toc
-rm -rf libcKrylov_doc.bbl
-rm -rf libcKrylov_doc.blg
-rm -rf libcKrylov_doc.out
-rm *~
-
-evince libcKrylov_doc.pdf &
+evince libcKrylov.pdf &
+ 
