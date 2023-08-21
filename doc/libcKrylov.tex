@@ -18,12 +18,9 @@
 
 \title{libcKrylov: A light weight linear solver library in C}
 
-
 \author{Pengliang Yang\\
 School of Mathematics, Harbin Institute of Technology, 150001, Harbin\\
 E-mail: ypl.2100@gmail.com}
-
-
 
 \begin{document}
 
@@ -31,7 +28,7 @@ E-mail: ypl.2100@gmail.com}
 
 \begin{abstract}
 
-  Solution of the linear system is of fundamental importance in science and engineering applications, which can be done by direct Gaussian elimination  or iterative methods in Krylov space. We deliver a light weight library  \verb|libcKrylov| for iterative solution of linear system using C programming. The solvers include conjugate gradient (CG) method, BiCGStab and GMRES and its preconditioned variants. The construction of \verb|libcKrylov| follows the reverse communication style, allowing the system specified by a sparse banded matrix or in a matrix-free fashion. The functionalities of the solvers are illustrated by the unsymmetric matrix inversion, and solving the large, sparse linear system after discretization of partial differential equations (the frequency domain wave equation and the Poisson equation). 
+  Solution of the linear system is of fundamental importance in science and engineering applications, which can be done by direct Gaussian elimination  or iterative methods in Krylov space. We deliver a light weight library  \verb|libcKrylov| for iterative solution of linear system using C programming. The solvers include conjugate gradient (CG) method, BiCGStab and GMRES and its preconditioned variants. The construction of \verb|libcKrylov| follows the reverse communication style, allowing the system specified by a sparse banded matrix  or in a matrix-free fashion. The functionalities of the solvers are illustrated by the unsymmetric matrix inversion, and solving the large, sparse linear system after discretization of partial differential equations (the frequency domain wave equation and the Poisson equation). 
 
 \end{abstract}
 
@@ -289,13 +286,13 @@ The code is accessible at github repository: \url{https://github.com/yangpl/libc
 \end{algorithm}
 
 \begin{algorithm}[H]
-  \caption{Preconditioned Conjugate gradient algorithm for solving $Ax=b$ \citep[algorithm 9.1]{Saad_2003_IMS}}
+  \caption{Preconditioned conjugate gradient algorithm for solving $Ax=b$ \citep[algorithm 9.1]{Saad_2003_IMS}}
   \begin{algorithmic}[1]
   \State $r_0:=b-A x_0=b$
   \State $z_0:=M^{-1}r_0$
   \State $p_0:=z_0$
     \For{$k=0,1,\cdots$ until convergence}
-    \State $\alpha_k=\frac{r_k^H p_k}{p_k^H Ap_k}$
+    \State $\alpha_k=\frac{r_k^H z_k}{p_k^H Ap_k}$
     \State $x_{k+1}=x_k + \alpha_k p_k$
     \State $r_{k+1}=r_k - \alpha_k A p_k$
     \State $z_{k+1}:=M^{-1}r_{k+1}$
