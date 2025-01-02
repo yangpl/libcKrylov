@@ -6,6 +6,6 @@ complex cdotprod(int n, complex *a, complex *b)
   int i;
   complex s;
   
-  for(i=0, s=0; i<n; i++) s += conj(a[i])*b[i];
+  for(i=0, s=0; i<n; i++) s += a[i]*conj(b[i]);
   return s;  
 }

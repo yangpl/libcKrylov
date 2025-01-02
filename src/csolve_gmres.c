@@ -33,8 +33,6 @@ void csolve_gmres(int n, complex *x, complex *b, cop_t Aop, int niter, double to
     g[0] = beta;
     memset(h, 0, (m+1)*m*sizeof(complex));
     if(iter==0) r0 = beta;
-    else if(beta<tol*r0) return;
-    if(verb) printf("iter=%d |error|=%e\n", iter, beta);
  
     for(j=0; j<m; j++){
       Aop(n, &v[j*n], w);//r=Av;
@@ -70,8 +68,8 @@ void csolve_gmres(int n, complex *x, complex *b, cop_t Aop, int niter, double to
       g[j] = conj(c[j])*g[j];
 
       tmp = cabs(g[j+1]);
-      if(tmp<tol*beta) { m=j+1; break; }
-      //else printf("j=%d error=%e\n", j, tmp); 
+      if(tmp<tol*r0) { m=j+1; return; }      
+      if(verb) printf("gmres iter=%d |error|=%e\n", iter*m+j, tmp);
     }
 
     //now, H becomes an upper triangule matrix, problem min\|g-Hy\|^2 is g=Hy
