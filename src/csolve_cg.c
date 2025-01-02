@@ -35,7 +35,7 @@ void csolve_cg(int n, complex *x, complex *b, cop_t Aop, int niter, double tol, 
     if(verb) printf("CG, k=%d rs=%e\n", k, rsold);
 
     Aop(n, p, Ap);//Ap=A*p
-    pAp = creal(cdotprod(n, p, Ap));
+    pAp = creal(cdotprod(n, Ap, p));
     alp = rsold/pAp;
 
     for(i=0; i<n; i++){
