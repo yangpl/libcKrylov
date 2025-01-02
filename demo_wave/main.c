@@ -6,7 +6,7 @@
 #include "csolver.h"
 #include "ccoo.h"
 
-ccoo_t *A;
+
 void Acoo_init(ccoo_t *A, float *v0, int n1, int n2, int ndamp, float dz, float dx, float omega);
 void Acoo_close(ccoo_t *A);
 void Acoo_apply(int n, complex *x, complex *y);
@@ -22,6 +22,7 @@ int main()
   float freq = 10.;
   float omega = 2*PI*freq;
   float *v0;
+  ccoo_t *A;
   
   int verb = 1;
   int method = 2;
