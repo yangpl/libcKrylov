@@ -13,20 +13,19 @@ void Acoo_apply(int n, complex *x, complex *y);
 
 int main()
 {
-  static float PI = 3.141592653589793238462643;
   int n1 = 201;
   int n2 = 201;
   float dz = 25;
   float dx = 25;
   int ndamp = 12;
   float freq = 10.;
-  float omega = 2*PI*freq;
+  float omega = 2*3.1415926*freq;
   float *v0;
   ccoo_t *A;
   
   int verb = 1;
-  int method = 2;
-  int niter = 300;
+  int method = 1;
+  int niter = 400;
   int isz = n1/2;
   int isx = n2/2;
   float tol = 1e-6;

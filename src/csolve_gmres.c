@@ -6,7 +6,6 @@
 
 #include "csolver.h"
 
-
 //GMRES without preconditioning
 void csolve_gmres(int n, complex *x, complex *b, cop_t Aop, int niter, double tol, int m, int verb)
 {

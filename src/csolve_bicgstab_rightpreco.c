@@ -7,19 +7,19 @@
 #include "csolver.h"
 
 //Reference: Jie Chen, 2016 JSC, Right preconditioned/Flexible BiCGStab paper
-void csolve_bicgstab_rightpreco(int n, complex *x, complex *b, op_t Aop, op_t invMop, int niter, double tol, int verb)
+void csolve_bicgstab_rightpreco(int n, complex *x, complex *b, cop_t Aop, cop_t invMop, int niter, double tol, int verb)
 {
   int i, k;
   double rs0, rs;
   complex rho_old, rho_new, alpha, beta, omega;
 
-  complex *r = alloc1complex(n);
-  complex *r0 = alloc1complex(n);//rprime0
-  complex *p = alloc1complex(n);
-  complex *q = alloc1complex(n);
-  complex *v = alloc1complex(n);
-  complex *s = alloc1complex(n);
-  complex *t = alloc1complex(n);
+  complex *r = malloc(n*sizeof(complex));
+  complex *r0 = malloc(n*sizeof(complex));
+  complex *p = malloc(n*sizeof(complex));
+  complex *q = malloc(n*sizeof(complex));
+  complex *v = malloc(n*sizeof(complex));
+  complex *s = malloc(n*sizeof(complex));
+  complex *t = malloc(n*sizeof(complex));
   
   Aop(n, x, v);//v=Ax
   for(i=0; i<n; i++) {
@@ -42,10 +42,10 @@ void csolve_bicgstab_rightpreco(int n, complex *x, complex *b, op_t Aop, op_t in
     
     invMop(n, s, r);//r=invM*s
     Aop(n, r, t);//t=Ar
-    omega = cdotprod(n, t, s)/creal(cdotprod(n, t, t));
+    omega = cdotprod(n, s, t)/creal(cdotprod(n, t, t));
 
     for(i=0; i<n; i++){
-      x[i] += alpha*p[i] + omega*s[i];
+      x[i] += alpha*q[i] + omega*r[i];
       r[i] = s[i] - omega*t[i];
     }
     rs = creal(cdotprod(n, r, r));
@@ -61,11 +61,10 @@ void csolve_bicgstab_rightpreco(int n, complex *x, complex *b, op_t Aop, op_t in
     rho_old = rho_new;
   }
 
-  free1complex(r);
-  free1complex(r0);
-  free1complex(p);
-  free1complex(v);
-  free1complex(s);
-  free1complex(t);
+  free(r);
+  free(r0);
+  free(p);
+  free(v);
+  free(s);
+  free(t);
 }
-

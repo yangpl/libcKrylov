@@ -6,20 +6,19 @@
 
 #include "csolver.h"
 
-
 //linear solver using BiCGStab, algorithm 7.7 in Saad book
-void csolve_bicgstab(int n, complex *x, complex *b, op_t Aop, int niter, double tol, int verb)
+void csolve_bicgstab(int n, complex *x, complex *b, cop_t Aop, int niter, double tol, int verb)
 {
   int i, k;
   double rs0, rs;
   complex rho_old, rho_new, alpha, beta, omega;
 
-  complex *r = alloc1complex(n);
-  complex *r0 = alloc1complex(n);//rprime0
-  complex *p = alloc1complex(n);
-  complex *v = alloc1complex(n);
-  complex *s = alloc1complex(n);
-  complex *t = alloc1complex(n);
+  complex *r = malloc(n*sizeof(complex));
+  complex *r0 = malloc(n*sizeof(complex));//rprime0
+  complex *p = malloc(n*sizeof(complex));
+  complex *v = malloc(n*sizeof(complex));
+  complex *s = malloc(n*sizeof(complex));
+  complex *t = malloc(n*sizeof(complex));
   
   Aop(n, x, v);//v=Ax
   for(i=0; i<n; i++) {
@@ -58,11 +57,10 @@ void csolve_bicgstab(int n, complex *x, complex *b, op_t Aop, int niter, double 
     rho_old = rho_new;
   }
 
-  free1complex(r);
-  free1complex(r0);
-  free1complex(p);
-  free1complex(v);
-  free1complex(s);
-  free1complex(t);
+  free(r);
+  free(r0);
+  free(p);
+  free(v);
+  free(s);
+  free(t);
 }
-
