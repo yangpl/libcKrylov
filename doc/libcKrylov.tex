@@ -331,7 +331,7 @@ The code is accessible at github repository: \url{https://github.com/yangpl/libc
     \State $s_k=r_k-\alpha_k A\tilde{p}_k$
     \State $\tilde{s}_k=M^{-1}s_k$
     \State $\omega_k = (A\tilde{s}_k , s_k )/(A\tilde{s}_k,A\tilde{s}_k ) $
-    \State $x_{k+1} = x_k + \alpha_k  p_k + \omega_k s_k$
+    \State $x_{k+1} = x_k + \alpha_k  \tilde{p}_k + \omega_k \tilde{s}_k$
     \State $r_{k+1}=s_k-\omega_k A\tilde{s}_k$
     \State $\beta_k = (r_{k+1},\tilde{r}_0 )/(r_k,\tilde{r}_0 )\cdot \alpha_k/\omega_k$
     \State $p_{k+1}=r_{k+1}+\beta_k(p_k-\omega_k A\tilde{p}_k)$
